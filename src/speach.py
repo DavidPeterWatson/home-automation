@@ -3,14 +3,13 @@ import pyaudio
 import json
 import os
 
-exitCommand = "exit"
-shutdownCommand = "shutdown my laptop"
-
-model = Model(r"/Users/david/repos/github/DavidPeterWatson/home-automation/src/vosk/vosk-model-small-en-us-0.15")
-recognizer = KaldiRecognizer(model, 16000)
-
+exitCommands = ['exit', 'done']
+shutdownCommands = ['shut down my laptop', 'shutdown my laptop']
 
 def listen():
+    model = Model(r"/Users/david/repos/github/DavidPeterWatson/home-automation/src/vosk/vosk-model-small-en-us-0.15")
+    recognizer = KaldiRecognizer(model, 16000)
+
     mic = pyaudio.PyAudio()
     stream = mic.open(format=pyaudio.paInt16, channels=1, rate=16000, input=True, frames_per_buffer=8192)
     stream.start_stream()
@@ -24,11 +23,16 @@ def listen():
             result = json.loads(resultString)
             print(result)
             sentence = result['text']
-            if sentence == exitCommand:
+            if sentence in exitCommands:
                 print("Closing")
                 done = True
-            if sentence == shutdownCommand:
+            if sentence in shutdownCommands:
+                print("Shutting down")
+                done = True
                 shutdownLaptop()
 
 def shutdownLaptop():
-   os.system("shutdown /s /t 1")
+   os.system("shutdown -h now")
+
+
+listen()
